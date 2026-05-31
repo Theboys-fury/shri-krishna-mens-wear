@@ -1,0 +1,254 @@
+<html>
+<head>
+  <title>Create Bill</title>
+ <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  getDocs,
+  deleteDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyAa92sH4N3UUP5K7Ckjs4vXi7Av2GUWE-o",
+
+  authDomain: "shri-krishna-mens-wear-503df.firebaseapp.com",
+
+  projectId: "shri-krishna-mens-wear-503df",
+
+  storageBucket: "shri-krishna-mens-wear-503df.firebasestorage.app",
+
+  messagingSenderId: "300393114134",
+
+  appId: "1:300393114134:web:da44285d850768aec52337"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// 🌍 make global
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+window.doc = doc;
+window.updateDoc = updateDoc;
+window.getDoc = getDoc;
+</script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body  style="background-image: url('bgimage.jpeg');">
+<a href="index.html" class="homeBtn">
+  <img src="home.png" alt="Home">
+</a>
+<h1 align="center" style="color: rgba(214, 214, 214, 0.932);">CREATE NEW BILL</h1>
+
+<div class="form-container">
+
+<form id="billForm">
+
+<label>Bill Number:</label><br>
+<input type="text" id="billno"><br><br>
+
+<label>Customer Name:</label><br>
+<input type="text" id="name"><br><br>
+
+<label>Contact No:</label><br>
+<input type="text" id="contact"><br><br>
+
+<label>Order Date:</label><br>
+<input type="date" id="orderDate"><br><br>
+
+<label>Delivery Date:</label><br>
+<input type="date" id="deliveryDate"><br><br>
+
+<label>Total Amount:</label><br>
+<input type="number" id="total"><br><br>
+
+<label>Advance:</label><br>
+<input type="number" id="advance"><br><br>
+
+<label>Balance:</label><br>
+<input type="number" id="balance" readonly><br><br>
+
+<h3>Measurements 📏</h3>
+
+<label>Chest:</label><br>
+<input type="text" id="chest"><br><br>
+
+<label>Waist:</label><br>
+<input type="text" id="waist"><br><br>
+
+<label>Shoulder:</label><br>
+<input type="text" id="shoulder"><br><br>
+
+<label>Sleeve:</label><br>
+<input type="text" id="sleeve"><br><br>
+
+<label>Length:</label><br>
+<input type="text" id="length"><br><br>
+
+<button type="submit">Save</button>
+
+</form>
+
+</div>
+
+<script type="module">
+
+// auto calculate balance
+document.getElementById("advance")
+.addEventListener("input", calculateBalance);
+
+document.getElementById("total")
+.addEventListener("input", calculateBalance);
+
+
+function calculateBalance(){
+
+  let total =
+  Number(document.getElementById("total").value) || 0;
+
+  let advance =
+  Number(document.getElementById("advance").value) || 0;
+
+  let balance = total - advance;
+
+  document.getElementById("balance").value = balance;
+
+}
+let editId = localStorage.getItem("editId");
+document.getElementById("billForm")
+.addEventListener("submit", async function(e) {
+
+  console.log("Submit Working 🔥");
+
+  e.preventDefault();
+
+  let balance = Number(document.getElementById("balance").value);
+  let status = "pending";
+
+if(editId && editId !== "null"){
+
+  const oldDoc = await getDoc(doc(db, "bills", editId));
+
+  if(oldDoc.exists()){
+
+  status = oldDoc.data().status;
+
+}else{
+
+  status ="pending";
+
+}
+}
+
+  let bill = {
+
+    billno: document.getElementById("billno").value,
+
+    name: document.getElementById("name").value,
+
+    contact: document.getElementById("contact").value,
+
+    orderDate: document.getElementById("orderDate").value,
+
+    deliveryDate: document.getElementById("deliveryDate").value,
+
+    total: document.getElementById("total").value,
+
+    advance: document.getElementById("advance").value,
+
+    balance: document.getElementById("balance").value,
+
+    chest: document.getElementById("chest").value,
+    waist: document.getElementById("waist").value,
+    shoulder: document.getElementById("shoulder").value,
+    sleeve: document.getElementById("sleeve").value,
+    length: document.getElementById("length").value,
+
+    status: status
+
+  };
+if (editId) {
+
+  await updateDoc(doc(db, "bills", editId), bill);
+
+  alert("Bill Updated ✅");
+
+  localStorage.removeItem("editId");
+
+} else {
+
+  await addDoc(collection(db, "bills"), bill);
+
+  alert("Bill Saved ✅");
+
+}
+  window.location.href = "index.html";
+});
+
+if (editId) {
+ 
+ const docRef = doc(db, "bills", editId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+  let bill = docSnap.data();
+
+  document.getElementById("billno").value = bill.billno;
+  document.getElementById("name").value = bill.name;
+  document.getElementById("contact").value = bill.contact;
+  document.getElementById("orderDate").value = bill.orderDate;
+  document.getElementById("deliveryDate").value = bill.deliveryDate;
+  document.getElementById("total").value = bill.total;
+  document.getElementById("advance").value = bill.advance;
+  document.getElementById("balance").value = bill.balance;
+  document.getElementById("chest").value = bill.chest;
+  document.getElementById("waist").value = bill.waist;
+  document.getElementById("shoulder").value = bill.shoulder;
+  document.getElementById("sleeve").value = bill.sleeve;
+  document.getElementById("length").value = bill.length;
+  document.querySelector("button").innerText = "Update";
+  
+}
+}
+
+
+document.getElementById("searchInput").addEventListener("input", function () {
+
+  let value = this.value.toLowerCase();
+
+  let cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+
+    let text = card.innerText.toLowerCase();
+
+    if (text.includes(value)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+
+  });
+
+});
+
+</script>
+</body>
+</html>

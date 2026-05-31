@@ -1,0 +1,225 @@
+<html>
+<head>
+  <title>Complete Bills</title>
+  <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyAa92sH4N3UUP5K7Ckjs4vXi7Av2GUWE-o",
+
+  authDomain: "shri-krishna-mens-wear-503df.firebaseapp.com",
+
+  projectId: "shri-krishna-mens-wear-503df",
+
+  storageBucket: "shri-krishna-mens-wear-503df.firebasestorage.app",
+
+  messagingSenderId: "300393114134",
+
+  appId: "1:300393114134:web:da44285d850768aec52337"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// 🌍 make global
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+window.updateDoc = updateDoc;
+window.doc = doc;
+</script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body  style="background-image: url('bgimage.jpeg');">
+<a href="index.html" class="homeBtn">
+  <img src="home.png" alt="Home">
+</a>
+<h1 align="center" style="color: white;">COMPLETED BILLS ✅</h1>
+  <input type="text" id="searchInput" placeholder="Search customer...">
+<div id="cardContainer">
+
+<script type="module">
+
+const querySnapshot = await getDocs(collection(db, "bills"));
+
+let bills = [];
+
+querySnapshot.forEach((doc) => {
+  bills.push({
+    id: doc.id,
+    ...doc.data()
+  });
+});
+let container = document.getElementById("cardContainer");
+
+container.innerHTML = "";
+
+bills.forEach((bill, index) => {
+  if (bill.status === "complete") {
+
+    let card = `
+    <div class="card complete">
+      <div class="top">
+
+        <h3>Bill No: ${bill.billno}</h3>
+      
+      <div class="menu">
+      <span class="dots" onclick="toggleMenu(${index},event)">⋮</span>
+
+      <div class="dropdown" id="menu-${index}">
+        <div onclick=markPending('${bill.id}')>Pending</div>
+        </div>
+      </div>
+
+      </div>
+
+       <div class="grid">
+  
+  <div><b>Name:</b> ${bill.name}</div>
+  <div><b>Total:</b> ₹${bill.total}</div>
+
+  <div><b>Contact:</b> ${bill.contact}</div>
+  <div><b>Advance:</b> ₹${bill.advance}</div>
+    
+  <div><b>Order Date:</b> ${bill.orderDate}</div>
+  <div><b>Balance:</b> ₹${bill.balance}</div>
+  <div><b>Delivery:</b> ${bill.deliveryDate}</div>
+   <button onclick="toggleMeasurement(${index})">
+  View Measurements 📏
+</button>
+<div class="measurementBox" id="measure-${index}">
+
+  <p><b>Chest:</b> ${bill.chest}</p>
+  <p><b>Waist:</b> ${bill.waist}</p>
+
+  <p><b>Shoulder:</b> ${bill.shoulder}</p>
+  <p><b>Sleeve:</b> ${bill.sleeve}</p>
+
+  <p><b>Length:</b> ${bill.length}</p>
+
+</div>
+
+
+  </div>
+   <p class="status">✔ Completed</p>
+</div>
+    `;
+
+    container.innerHTML += card;
+  }
+});
+</script>
+<script>
+
+document.getElementById("searchInput").addEventListener("input", function () {
+
+  let value = this.value.toLowerCase();
+
+  let cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+
+    let text = card.innerText.toLowerCase();
+
+    if (text.includes(value)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+
+  });
+
+});
+
+</script>
+<script>
+
+function toggleMeasurement(index) {
+
+  let box = document.getElementById("measure-" + index);
+
+  if (box.style.display === "block") {
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+  }
+
+}
+window.markPending = async function(id){
+
+  console.log(id);
+
+  await window.updateDoc(
+    window.doc(window.db, "bills", id),
+    {
+      status: "pending"
+    }
+  );
+
+  alert("Moved To Pending 🔄");
+
+  location.reload();
+
+}
+window.toggleMenu = function(index, event){
+
+  event.stopPropagation();
+
+  let menu =
+  document.getElementById(`menu-${index}`);
+
+  document
+  .querySelectorAll(".dropdown")
+  .forEach(drop => {
+
+    if(drop !== menu){
+
+      drop.style.display = "none";
+
+    }
+
+  });
+
+  if(menu.style.display === "block"){
+
+    menu.style.display = "none";
+
+  }else{
+
+    menu.style.display = "block";
+
+  }
+
+}
+window.onclick = function(){
+
+  document
+  .querySelectorAll(".dropdown")
+  .forEach(drop => {
+
+    drop.style.display = "none";
+
+  });
+
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<html>
+    <head>
+        <title>Web Page</title>
+       <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyAa92sH4N3UUP5K7Ckjs4vXi7Av2GUWE-o",
+
+  authDomain: "shri-krishna-mens-wear-503df.firebaseapp.com",
+
+  projectId: "shri-krishna-mens-wear-503df",
+
+  storageBucket: "shri-krishna-mens-wear-503df.firebasestorage.app",
+
+  messagingSenderId: "300393114134",
+
+  appId: "1:300393114134:web:da44285d850768aec52337"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// 🌍 make global
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+
+</script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+  <body style="background-image: url('bgimage.jpeg');" class="dashboard"> 
+    
+<div class="topAnimation">
+  <video autoplay muted playbackRate="0.5">
+    <source src="intro.mp4" type="video/mp4">
+  </video>
+</div>
+
+      <div class="container">
+        <a href="billdata.html">
+        <div class="rectangle">TOTAL
+          <span id="totalCount"> 0 </span>
+        </div></a>
+         <a href="create.html" 
+         onclick="localStorage.removeItem('editId')">
+        <div class="rectangle">CREATE NEW</div></a>
+      </div>
+            <div class="container">
+              <a href="complete.html">
+        <div class="rectangle">COMPLETE
+           <span id="completeCount"> 0 </span>
+        </div>
+        </a>
+        <a href="pending.html">
+        <div class="rectangle">PENDING
+           <span id="pendingCount"> 0 </span>
+           </div></a>
+      </div>
+      <div class="menuIcon" onclick="openSidebar()">☰</div>
+
+<div id="sidebar" class="sidebar">
+  <span class="closeBtn" onclick="closeSidebar()">✖</span>
+
+  <h3>Menu</h3>
+
+  <a href="index.html">Dashboard</a><br>
+  <a href="pending.html">Pending</a><br>
+  <a href="complete.html">Complete</a><br>
+</div>
+<script type="module">
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+  const querySnapshot = await getDocs(collection(db, "bills"));
+
+  let bills = [];
+
+  querySnapshot.forEach((doc) => {
+    bills.push(doc.data());
+  });
+
+  let total = bills.length;
+
+  let complete = bills.filter(b => b.status === "complete").length;
+
+  let pending = bills.filter(b => b.status === "pending").length;
+
+  document.getElementById("totalCount").innerText = total;
+
+  document.getElementById("completeCount").innerText = complete;
+
+  document.getElementById("pendingCount").innerText = pending;
+
+});
+
+</script>
+<script>
+function toggleMenu() {
+  let menu = document.getElementById("menuDropdown");
+
+  if (menu.style.display === "block") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "block";
+  }
+}
+
+// close when clicking outside
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".topMenu")) {
+    document.getElementById("menuDropdown").style.display = "none";
+  }
+});
+
+</script>
+<script>
+function openSidebar() {
+  document.getElementById("sidebar").style.left = "0";
+
+  
+  document.querySelector(".menuIcon").style.display = "none";
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").style.left = "-260px";
+
+  
+  document.querySelector(".menuIcon").style.display = "block";
+}
+
+
+document.addEventListener("click", function(e) {
+  let sidebar = document.getElementById("sidebar");
+
+  if (!sidebar.contains(e.target) && !e.target.classList.contains("menuIcon")) {
+    sidebar.style.left = "-250px";
+  }
+});
+
+</script>
+<script>
+function openSidebar() {
+  document.getElementById("sidebar").style.left = "0";
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").style.left = "-260px";
+}
+</script>
+
+    </body>
+</html>
