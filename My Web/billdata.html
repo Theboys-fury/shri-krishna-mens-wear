@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BILL DATA</title>
+        <script type="module">
+          import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  getDoc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+         
+         import { initializeApp } 
+         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyAa92sH4N3UUP5K7Ckjs4vXi7Av2GUWE-o",
+
+  authDomain: "shri-krishna-mens-wear-503df.firebaseapp.com",
+
+  projectId: "shri-krishna-mens-wear-503df",
+
+  storageBucket: "shri-krishna-mens-wear-503df.firebasestorage.app",
+
+  messagingSenderId: "300393114134",
+
+  appId: "1:300393114134:web:da44285d850768aec52337"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+console.log("Firebase working 🔥");
+
+// 🌍 make global
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.getDocs = getDocs;
+window.doc = doc;
+window.updateDoc = updateDoc;
+window.getDoc = getDoc;
+
+</script>
+       <link rel="stylesheet" href="style.css">  
+    </head>
+<body  style="background-image: url('bgimage.jpeg');" class="dashboard">
+  <a href="index.html" class="homeBtn">
+  <img src="home.png" alt="Home">
+</a>
+<div class="topBar">
+  <input type="text" id="searchInput"placeholder="Search customer...">
+
+  <a href="pra.html" class="logo">
+    <img src="search.png">
+  </a>
+
+</div>
+    <h1 align="center"style="color: white;">BILL DATA</h1>
+<div class="topBar">
+</div>    <div id="cardContainer"> 
+<script type="module">
+console.log("Script Running 🔥");
+let billsSnapshot = await getDocs(collection(db, 'bills'));
+
+let bills = [];
+
+billsSnapshot.forEach((doc) => {
+  bills.push({
+    id: doc.id,
+    ...doc.data()
+  });
+});
+
+</script>
+<script type="module">
+
+const querySnapshot = await getDocs(collection(db, "bills"));
+
+let bills2 = [];
+
+
+querySnapshot.forEach((docu) => {
+
+  bills2.push({
+    id: docu.id,
+    ...docu.data()
+  });
+
+});
+
+
+// 🔥 CARD CONTAINER
+let container = document.getElementById("cardContainer");
+
+container.innerHTML = "";
+
+
+// 🔥 SHOW CARDS
+bills2.forEach((bill, index) => {
+
+  let card = `
+
+  <div class="card">
+
+    <div class="top">
+    <h3>Bill No: ${bill.billno}</h3>
+
+    <div class="menu">
+      <span class="dots" onclick="toggleMenu(${index},event)">⋮</span>
+
+      <div class="dropdown" id="menu-${index}">
+        <div onclick="editBill('${bill.id}')">✎</div>
+        <div onclick="deleteBill('${bill.id}')">🗑️</div>
+      </div>
+    </div>
+  </div>
+
+    <div class="grid">
+
+      <div><b>Name:</b> ${bill.name}</div>
+
+      <div><b>Total:</b> ₹${bill.total}</div>
+
+      <div><b>Contact:</b> ${bill.contact}</div>
+
+      <div><b>Advance:</b> ₹${bill.advance}</div>
+
+      <div><b>Order Date:</b> ${bill.orderDate}</div>
+
+      <div><b>Balance:</b> ₹${bill.balance}</div>
+
+      <div><b>Delivery:</b> ${bill.deliveryDate}</div>
+
+      <div><b>Status:</b> ${bill.status}</div>
+
+    </div>
+
+    <button onclick="toggleMeasurement(${index})">
+
+      View Measurements 📏
+
+    </button>
+
+    <div class="measurementBox" id="measure-${index}">
+
+      <p><b>Chest:</b> ${bill.chest}</p>
+
+      <p><b>Waist:</b> ${bill.waist}</p>
+
+      <p><b>Shoulder:</b> ${bill.shoulder}</p>
+
+      <p><b>Sleeve:</b> ${bill.sleeve}</p>
+
+      <p><b>Length:</b> ${bill.length}</p>
+
+    </div>
+
+  </div>
+
+  `;
+
+  container.innerHTML += card;
+
+});
+
+
+window.deleteBill = async function(id){
+
+  let confirmDelete =
+  confirm("Delete this bill?");
+
+  if(confirmDelete){
+
+    await deleteDoc(doc(db, "bills", id));
+
+    alert("Bill Deleted ❌");
+
+    location.reload();
+
+  }
+
+}
+
+</script>
+<script>
+function searchBills() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let rows = document.querySelectorAll("#tableBody tr");
+
+  rows.forEach(row => {
+    let rowText = row.innerText.toLowerCase(); // full row
+
+    if (rowText.includes(input)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+</script>
+<script>
+function toggleMenu(index) {
+  let menu = document.getElementById("menu-" + index);
+
+  // close all menus first
+  document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+
+  // toggle current
+  if (menu.style.display === "block") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "block";
+  }
+}
+</script>
+<script>
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".menu")) {
+    document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+  }
+});
+</script>
+<script>
+
+document.getElementById("searchInput").addEventListener("input", function () {
+
+  let value = this.value.toLowerCase();
+
+  let cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+
+    let text = card.innerText.toLowerCase();
+
+    if (text.includes(value)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+
+  });
+
+});
+
+</script>
+<script>
+
+function toggleMeasurement(index) {
+
+  let box = document.getElementById("measure-" + index);
+
+  if (box.style.display === "block") {
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+  }
+
+}
+window.toggleMenu = function(index, event){
+
+  event.stopPropagation();
+
+  let menu = document.getElementById(`menu-${index}`);
+
+  if(menu.style.display === "block"){
+    menu.style.display = "none";
+  }else{
+    menu.style.display = "block";
+  }
+
+}
+window.editBill = function(id){
+
+  localStorage.setItem("editId", id);
+
+  window.location.href = "create.html";
+
+}
+</script>
+</body>
+</html>

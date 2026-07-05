@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PENDING BILLS</title>
+        <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyAa92sH4N3UUP5K7Ckjs4vXi7Av2GUWE-o",
+
+  authDomain: "shri-krishna-mens-wear-503df.firebaseapp.com",
+
+  projectId: "shri-krishna-mens-wear-503df",
+
+  storageBucket: "shri-krishna-mens-wear-503df.firebasestorage.app",
+
+  messagingSenderId: "300393114134",
+
+  appId: "1:300393114134:web:da44285d850768aec52337"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// 🌍 make global
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+
+</script>
+       <link rel="stylesheet" href="style.css">  
+    </head>
+<body  style="background-image: url('bgimage.jpeg');" class="dashboard">
+  <a href="index.html" class="homeBtn">
+  <img src="home.png" alt="Home">
+</a>
+    <h1 align="center" style="color: white;">PENDING BILLS</h1>
+  <input type="text" id="searchInput" placeholder="Search customer...">
+
+<div id="cardContainer">
+<script type="module">
+
+const querySnapshot = await getDocs(collection(db, "bills"));
+
+let bills = [];
+
+querySnapshot.forEach((doc) => {
+  bills.push({
+    id: doc.id,
+    ...doc.data()
+  });
+});
+let container = document.getElementById("cardContainer");
+
+container.innerHTML = "";
+
+bills.forEach((bill, index) => {
+  if (bill.status === "pending") {
+
+    let card = `
+      <div class="card">
+        <h3>Bill No: ${bill.billno}</h3>
+
+        <div class="grid">
+  
+  <div><b>Name:</b> ${bill.name}</div>
+  <div><b>Total:</b> ₹${bill.total}</div> 
+
+  <div><b>Contact:</b> ${bill.contact}</div>
+  <div><b>Advance:</b> ₹${bill.advance}</div>
+    
+  <div><b>Order Date:</b> ${bill.orderDate}</div>
+  <div><b>Balance:</b> ₹${bill.balance}</div>
+  <div><b>Delivery:</b> ${bill.deliveryDate}</div>
+  <div><b>Status:</b> ${bill.status}</div>
+  <button onclick="toggleMeasurement(${index})">
+  View Measurements 📏
+</button>
+<div class="measurementBox" id="measure-${index}">
+
+  <p><b>Chest:</b> ${bill.chest}</p>
+  <p><b>Waist:</b> ${bill.waist}</p>
+
+  <p><b>Shoulder:</b> ${bill.shoulder}</p>
+  <p><b>Sleeve:</b> ${bill.sleeve}</p>
+
+  <p><b>Length:</b> ${bill.length}</p>
+
+</div>
+
+  <button onclick="markComplete('${bill.id}')">Mark as Complete</button>
+</div>
+    `;
+
+    container.innerHTML += card;
+  }
+});
+</script>
+<script type="module">
+import {
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+window.markComplete = async function(id) {
+
+  const billRef = doc(db, "bills", id);
+
+  await updateDoc(billRef, {
+    status: "complete"
+  });
+
+  location.reload();
+
+}
+</script>
+<script>
+
+document.getElementById("searchInput").addEventListener("input", function () {
+
+  let value = this.value.toLowerCase();
+
+  let cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+
+    let text = card.innerText.toLowerCase();
+
+    if (text.includes(value)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+
+  });
+
+});
+
+</script>
+<script>
+
+function toggleMeasurement(index) {
+
+  let box = document.getElementById("measure-" + index);
+
+  if (box.style.display === "block") {
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+  }
+
+}
+
+</script>
+</body>
+</html>
